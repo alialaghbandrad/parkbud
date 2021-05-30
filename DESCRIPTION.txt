@@ -1,0 +1,10 @@
+Parkbud Project
+
+Members: Philip Ranieri, Nick Xenos, Ali Alaghbandrad
+
+URL: parkbud.ipd24.ca
+
+GIT: https://bitbucket.org/parkbudca/parkbud/src/
+master/
+
+Trello: https://trello.com/b/TtMi0ES9/parkbud

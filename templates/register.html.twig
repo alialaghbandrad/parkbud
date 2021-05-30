@@ -1,0 +1,178 @@
+{% extends "master.html.twig" %}
+
+{% block stylesheet %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+                integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/46f3607012.js" crossorigin="anonymous"></script>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+    
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+	
+{% endblock stylesheet %}
+
+{% block title %}
+    {% if userSession %}
+        My Account
+    {% else %}
+        Register New User
+    {% endif %}
+{% endblock title %}
+
+
+{% block content %}
+    <div class="py-5 container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="contact-info">
+                    
+                    {% if userSession %}
+                        <h3>My Account</h3>
+                        <p>Please update your profile and submit</p>
+                    {% else %}
+                        <h3>Registration</h3>
+                        <p>To register a new account, please enter information in the form below.<br></p>
+                    {% endif %}
+                </div>
+            </div>
+            <form method="POST" class="col-md-12">
+                
+                {% if errors %}
+                    {% for e in errors %}
+                    <p class="form-control is-invalid text-white bg-danger">{{ e }}</p>
+                    {% endfor %}
+                {% endif %}
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="inputFirstname">First name</label>
+                        <input name="firstName" type="text" class="form-control" id="inputFirstname" value="{{ user.firstName }}" placeholder="First name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="inputLastname">Last name</label>
+                        <input name="lastName" type="text" class="form-control" id="inputLastname" value="{{ user.lastName }}" placeholder="Last name" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="inputEmail">Email Address</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputEmail">@</span>
+                            </div>
+                            <input name="email" value="{{ user.email }}" type="email" class="form-control" id="validationServerEmail" placeholder="Email Address" aria-describedby="inputGroupPrepend3" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="Phone">Phone Number</label>
+                        <input name="phone" type="text" class="form-control" id="Phone" value="{{ user.phone }}" placeholder="ex: 555-222-9999" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="inputUsername">Username</label>
+                        <input name="userName" type="text" class="form-control" id="inputUsername" value="{{ user.userName }}" placeholder="User Name" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="inputPassword">Password</label>
+                        <input name="pass1" type="password" class="form-control" id="inputPassword" value="{{ user.pass1 }}" placeholder="Password" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input name="pass2" type="password" class="form-control" id="confirmPassword" value="{{ user.pass2 }}" placeholder="Password" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <label for="inputAddress">Address (Street number and name)</label>
+                        <input name="street" type="text" class="form-control" id="inputAddress" placeholder="ex: 9032 Park Avenue" value="{{ user.street }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="inputCity">City</label>
+                        <input name="city" type="text" class="form-control" id="inputCity" placeholder="City" value="{{ user.city }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="inputProvince">Province</label>
+                        <select name="province" id="inputProvince" class="form-control" required>
+                            <option selected>Choose...</option>
+                            <option value="AB" {% if user.province == 'AB' %} selected="selected"{% endif %}>AB</option>
+                            <option value="BC" {% if user.province == 'BC' %} selected="selected"{% endif %}>BC</option>
+                            <option value="MB" {% if user.province == 'MB' %} selected="selected"{% endif %}>MB</option>
+                            <option value="NB" {% if user.province == 'NB' %} selected="selected"{% endif %}>NB</option>
+                            <option value="NL" {% if user.province == 'NL' %} selected="selected"{% endif %}>NL</option>
+                            <option value="NT" {% if user.province == 'NT' %} selected="selected"{% endif %}>NT</option>
+                            <option value="NS" {% if user.province == 'NS' %} selected="selected"{% endif %}>NS</option>
+                            <option value="NU" {% if user.province == 'NU' %} selected="selected"{% endif %}>NU</option>
+                            <option value="ON" {% if user.province == 'ON' %} selected="selected"{% endif %}>ON</option>
+                            <option value="PE" {% if user.province == 'PE' %} selected="selected"{% endif %}>PE</option>
+                            <option value="QC" {% if user.province == 'QC' %} selected="selected"{% endif %}>QC</option>
+                            <option value="SK" {% if user.province == 'SK' %} selected="selected"{% endif %}>SK</option>
+                            <option value="YT" {% if user.province == 'YT' %} selected="selected"{% endif %}>YT</option>
+                        </select>
+                        </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="inputPostalCode">Postal Code</label>
+                        <input name="postCode" type="text" class="form-control" id="inputPostalCode" value="{{ user.postalCode }}" placeholder="ex: H3S 2K9" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <input name="isAgree" class="form-check-input" type="checkbox" id="invalidCheck3" required>
+                        <label class="form-check-label" for="invalidCheck3">
+                            I Agree to terms and conditions
+                        </label>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit form</button>
+            </form>
+            
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $err =  $('#err');
+            $('input[name=email]').on("blur",function() {
+                var email = $(this).val();
+
+                email = encodeURIComponent(email);
+                $err.load("/isemailtaken/" + email);
+
+                if($err.is(':empty')){
+                    $err.addClass("d-none");
+                }else{
+                    $err.removeClass("d-none");
+                }
+            });
+            $('input[name=userName]').on("blur",function() {
+                var userName = $(this).val();
+
+                if(userName.length > 2){
+                    $err.load("/isusernametaken/" + userName);
+
+                    if($err.is(':empty')){
+                        $err.addClass("d-none");
+                    }else{
+                        $err.removeClass("d-none");
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock scripts %}

@@ -1,0 +1,601 @@
+{% extends "master.html.twig" %}
+{% block stylesheet %}
+	<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+{% endblock stylesheet %}
+
+{% block title %}
+	{% if userSession %}
+		Add Rule
+	{% else %}
+		Register New User
+	{% endif %}
+
+{% endblock title %}
+
+{% block content %}
+
+	<div class="container-fluid">
+
+
+		<h3 class="logo row">Add Rule</h1>
+		<div
+			class="row">
+
+			<!-- if Session -->
+
+
+			<div
+				class="col-sm map col-md-6">
+
+				<!--   MAP LEFT COLUMN -->
+
+				<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+				<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+
+    
+	
+				<style type="text/css">
+				#map {
+					height: 100%;
+				}
+
+				/* Optional: Makes the sample page fill the window. */
+				html,
+				body {
+					height: 100%;
+					margin: 0;
+					padding: 0;
+					
+				}
+				</style>
+
+				
+				<p id="mainParkHeader" >Where would you like to add parking rule?</p>
+
+				<input
+				id="pac-input"
+				class="controls rounded center col-md-6"
+				type="text"
+				placeholder="Search Box"
+				
+				/>
+				
+				<div id="mainMapContainer">
+				<div id="map" style="height:600px;width:800px;"></div>
+				</div>
+				<p id="demo"></p>
+
+			<script>
+			let map;
+
+
+				
+
+			function initMap() {
+			// start test
+			
+
+			// end test
+
+
+				map = new google.maps.Map(document.getElementById("map"), {
+					center: { lat: 45.484173, lng: -73.610487 },  
+					zoom: 10,
+					mapTypeId: "roadmap",
+				});
+
+				// Create the search box and link it to the UI element.
+				const input = document.getElementById('pac-input');
+				// var autocomplete = new google.maps.places.Autocomplete(input);   // NEW
+				const searchBox = new google.maps.places.SearchBox(input);
+				map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+				
+				var autocomplete = new google.maps.places.Autocomplete(input);
+				google.maps.event.addListener(autocomplete, 'place_changed', function () {
+				var place = autocomplete.getPlace();
+				$("#longitude").val(place.geometry.viewport.La.g)
+				$("#latitude").val(place.geometry.viewport.Ua.g)
+				$("#streetname").val(place.address_components[1].short_name)
+				});
+				
+
+
+				// Bias the SearchBox results towards current map's viewport.
+				map.addListener("bounds_changed", () => {
+					searchBox.setBounds(map.getBounds());
+				});
+				let markers = [];
+				// Listen for the event fired when the user selects a prediction and retrieve
+				// more details for that place.
+				searchBox.addListener("places_changed", () => {
+					const places = searchBox.getPlaces();
+
+					if (places.length == 0) {
+						return;
+					}
+					// Clear out the old markers.
+					markers.forEach((marker) => {
+						marker.setMap(null);
+					});
+					markers = [];
+					// For each place, get the icon, name and location.
+					const bounds = new google.maps.LatLngBounds();
+					places.forEach((place) => {
+						if (!place.geometry || !place.geometry.location) {
+							console.log("Returned place contains no geometry");
+							return;
+						}
+						const icon = {
+							url: place.icon,
+							size: new google.maps.Size(71, 71),
+							origin: new google.maps.Point(0, 0),
+							anchor: new google.maps.Point(17, 34),
+							scaledSize: new google.maps.Size(25, 25),
+						};
+							
+						// Create a marker for each place.
+						markers.push(
+							new google.maps.Marker({
+								map,
+								icon,
+								title: place.name,
+								position: place.geometry.location,
+							})
+						);
+							
+						if (place.geometry.viewport) {
+							// Only geocodes have viewport.
+							bounds.union(place.geometry.viewport);
+						} else {
+							bounds.extend(place.geometry.location);
+						}
+					});
+					map.fitBounds(bounds);
+				});
+					const iconBase =
+					"https://developers.google.com/maps/documentation/javascript/examples/full/images/";
+					const icons = {
+					parking: {
+						icon: iconBase + "parking_lot_maps.png",
+					},
+					library: {
+						icon: iconBase + "library_maps.png",
+					},
+					info: {
+						icon: iconBase + "info-i_maps.png",
+					},
+					};
+			
+				var marker;
+				var markerLatLng;
+				const features = [];
+
+				var InfoObj = [];
+				// addMarkerInfo();
+
+				{% for rule in rulesList %}
+
+			features.push(         
+                {
+                  placeName: '<b>Parking rule:</b> <br>Street name: {{rule.streetName}} <br>',
+                  periodStartEnd: 'Period :<br> <b>From {{rule.periodStart}} To {{rule.periodEnd}}</b><br> These are the time where Parking is <span style="color:red">PROHIBITED</span></em></b>',
+                  streetSide: '{{rule.sideFlag}}',
+                  parkingMeterEvenOdd: '{% if rule.parkingMeter != 0 %}There is a parking Meter here {% else %} There is no Parking Meter Here {% endif %} <br> ', 
+                  evenDays: '<div style="display: {% if rule.sideFlag == 0 %}inline;" {% else %} none;" {% endif %}><span style="font-weight: 900">Even Side Rules : <br><br> </span>{% if rule.mondayStart != "00:00:00" %} <b><u>Monday:</u></b> {{rule.mondayStart|date('H:i')}} to {{rule.mondayEnd|date('H:i')}} {% else %} <b><u>Monday</u></b>: N/A {% endif %} <br>{% if rule.tuesdayStart != "00:00:00" %} <b><u>Tuesday:</u></b> {{rule.tuesdayStart|date('H:i')}} to {{rule.tuesdayEnd|date('H:i')}} {% else %} <u><b>Tuesday</b></u>: N/A {% endif %}<br>{% if rule.wednesdayStart != "00:00:00" %} <b><u>Wednesday:</u></b> {{rule.wednesdayStart|date('H:i')}} to {{rule.wednesdayEnd|date('H:i')}} {% else %} <u><b>Wednesday</b></u>: N/A {% endif %}<br>{% if rule.thursdayStart != "00:00:00" %} <b><u>Thursday:</u></b> {{rule.thursdayStart|date('H:i')}} to {{rule.thursdayEnd|date('H:i')}} {% else %} <u><b>Thursday</b></u>: N/A {% endif %}<br>{% if rule.fridayStart != "00:00:00" %} <b><u>Friday:</u></b> {{rule.fridayStart|date('H:i')}} to {{rule.fridayEnd|date('H:i')}} {% else %} <u><b>Friday</b></u>: N/A {% endif %}<br>{% if rule.saturdayStart != "00:00:00" %} <b><u>Saturday:</u></b> {{rule.saturdayStart|date('H:i')}} to {{rule.saturdayEnd|date('H:i')}} {% else %} <u><b>Saturday</b></u>: N/A {% endif %}<br>{% if rule.sundayStart != "00:00:00" %} <b><u>Sunday:</u></b> {{rule.sundayStart|date('H:i')}} to {{rule.sundayEnd|date('H:i')}} {% else %} <u><b>Sunday</b></u>: N/A {% endif %}</div>',
+                  oddDays: '<div style="display: {% if rule.sideFlag == 1 %}inline;" {% else %} none;" {% endif %}><span style="font-weight: 900">Odd Side Rules : <br><br> </span>{% if rule.mondayStart != "00:00:00" %} <b><u>Monday:</u></b> {{rule.mondayStart|date('H:i')}} to {{rule.mondayEnd|date('H:i')}} {% else %} <b><u>Monday</u></b>: N/A {% endif %} <br>{% if rule.tuesdayStart != "00:00:00" %} <b><u>Tuesday:</u></b> {{rule.tuesdayStart|date('H:i')}} to {{rule.tuesdayEnd|date('H:i')}} {% else %} <u><b>Tuesday</b></u>: N/A {% endif %}<br>{% if rule.wednesdayStart != "00:00:00" %} <b><u>Wednesday:</u></b> {{rule.wednesdayStart|date('H:i')}} to {{rule.wednesdayEnd|date('H:i')}} {% else %} <u><b>Wednesday</b></u>: N/A {% endif %}<br>{% if rule.thursdayStart != "00:00:00" %} <b><u>Thursday:</u></b> {{rule.thursdayStart|date('H:i')}} to {{rule.thursdayEnd|date('H:i')}} {% else %} <u><b>Thursday</b></u>: N/A {% endif %}<br>{% if rule.fridayStart != "00:00:00" %} <b><u>Friday:</u></b> {{rule.fridayStart|date('H:i')}} to {{rule.fridayEnd|date('H:i')}} {% else %} <u><b>Friday</b></u>: N/A {% endif %}<br>{% if rule.saturdayStart != "00:00:00" %} <b><u>Saturday:</u></b> {{rule.saturdayStart|date('H:i')}} to {{rule.saturdayEnd|date('H:i')}} {% else %} <u><b>Saturday</b></u>: N/A {% endif %}<br>{% if rule.sundayStart != "00:00:00" %} <b><u>Sunday:</u></b> {{rule.sundayStart|date('H:i')}} to {{rule.sundayEnd|date('H:i')}} {% else %} <u><b>Sunday</b></u>: N/A {% endif %}</div>',
+                  createdAt: 'Posted on: {{rule.createdTS}}',
+                  image: '{{rule.image}}',
+                  position: new google.maps.LatLng(
+                    {{rule.latitude}},
+                    {{rule.longitude}}
+                  ),
+                  type: "parking",
+      		});
+    
+
+
+      // Create markers.
+
+
+
+      for (let i = 0; i < features.length; i++) {
+        
+            var contentString = '<p>' + features[i].placeName + '</p>' + '<p>' + features[i].periodStartEnd + '</p>' + '</p>' + '<p>' + features[i].parkingMeterEvenOdd + '</p>' + '<p>' + features[i].evenDays + '</p>' + '<p>' + features[i].oddDays + '</p>' + '<p>' + features[i].createdAt + '</p>' + '<a href="/uploads/' + features[i].image + '"><img class="img-fluid"  src="/uploads/' + features[i].image + '" width="200rem" alt="Current image"></a>' + '<br><br>' + '<a href="#" class="btn btn-danger">Dispute Rule</a>'
+            ;
+
+						const marker = new google.maps.Marker({
+						position: features[i].position,
+						icon: icons[features[i].type].icon,
+						
+						map: map,
+						});
+						
+
+						const infowindow = new google.maps.InfoWindow({
+							content:  contentString,
+							
+						});
+
+						marker.addListener("click", function() {
+						closeOtherInfo();
+						infowindow.open(marker.get('map'), marker);
+						InfoObj[0] = infowindow;
+						});
+
+						function closeOtherInfo() {
+						if( InfoObj.length > 0 ) {
+							InfoObj[0].set("marker", null);
+							InfoObj[0].close();
+							InfoObj[0].length = 0;
+						}
+						}
+
+				}
+
+				
+
+				{% endfor %}
+			
+			}
+			
+
+			</script>
+
+			<body>
+				
+
+				<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+				
+
+				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaIDYagxIULOH3ghDCLMJvuGLGQ9hXJh8&libraries=places&callback=initMap"
+				type="text/javascript"></script>
+
+			</body>
+
+
+
+
+
+			<!--
+							<input id="pac-input" class="controls rounded" type="text" placeholder="Type Adress or Street"/>
+
+							<div id="mainMapContainer">
+								<div class="map" style="height:800px;width:100%;" id="map"></div>
+							</div>
+
+
+							<script src="/index.js"></script>
+
+							<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+							<!-- Async script executes immediately and must be after any DOM elements used in callback. 
+							<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLoTwm91EVWlIY1yMAfFmLQVQeUB7espA&callback=initAutocomplete&libraries=places&v=weekly&callback=initAutocomplete"></script>
+			-->
+		</div>
+
+			<div class="col-sm-1"></div>
+			<div
+				class="col-sm-5 ">
+				<!--   FORM Center COLUMN -->
+
+				<div>
+
+					<form
+						method="POST" enctype="multipart/form-data">
+
+						<!-- Display Street Name from Map Search -->
+						<input name="sideFlag" id="sideFlag" type="hidden"/>
+						<input name="pmVal" id="pmVal" type="hidden"/>
+						<input name="longitude" id="longitude" type="hidden"/>
+						<input name="latitude" id="latitude" type="hidden"/>
+						<div class="form-group row text-center">
+							<label for="streetname">Street Name</label>
+							<input type="text" class="form-control" id="streetname" name="streetName" value="" placeholder="street name">
+
+						</div>
+						<!-- Select Time Period For Applicable parking rules -->
+						<div class="form-group row text-center">
+							<label for="dateStart">Period start</label>
+							<input type="date" name="periodStart" class="form-control" id="dateStart" value="">
+
+						</div>
+						<div class="form-group row text-center">
+							<label for="dateEnd">Period End</label>
+							<input type="date" name="periodEnd" class="form-control" id="dateEnd" value="">
+
+						</div>
+
+						<div class="from-group row">
+							<label for="parkingMeter">Does this tpace have a parking meter?</label>
+							<br>
+							<div >
+								<div class="form-check">
+									<input onclick="checkRadio(id);" class="form-check-input" type="radio" name="parkingMeter" id="yesPm" value="1">  
+									<label  class="form-check-label" for="parkingMeter">Yes</label>
+								</div>
+
+								<div class="form-check">
+									<input onclick="checkRadio(id);" class="form-check-input" type="radio" name="parkingMeter" id="noPm" value="0" checked> 
+									<label class="form-check-label" for="parkingMeter">No</label>
+								</div>
+								
+
+								<br>
+
+								<!-- TABS -->
+								<div class="ruleSect row form-group">
+									<nav class="tabBar">
+										<ul class="nav nav-tabs" id="side-tabs" role="tab">
+											<li class="nav-item nav-link active">
+												<a onclick="sideRole(0);" id="nav-home-tab" data-toggle="tab" href="#a" role="tab" aria-controls="nav-home" aria-selected="true">Even</a>
+											</li>
+											<li class="nav-item nav-link">
+												<a onclick="sideRole(1);" id="nav-profile-tab" data-toggle="tab" href="#b" role="tab" aria-controls="nav-profile" aria-selected="false">Odd</a>
+											</li>
+
+										</ul>
+									</nav>
+
+									<div class="tab-content">
+
+										<div class="tab-pane active" id="a" role="tablist">
+											<br><br>
+											<p>Please Upload picture of the Even Side Parking Sign</p>
+
+											<input class="btn btn-primary" type="file" id="myFile" name="image">
+											<br><br>
+
+											<nav class="tabBar">
+
+												<ul class="nav nav-tabs" id="nav-tab" role="tablist">
+
+													<li class="nav-item nav-link active">
+														<a data-toggle="tab" href="#mon" role="tab" aria-selected="true">Mon</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#tue" role="tab" aria-selected="false">Tue</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#wed" role="tab" aria-selected="false">Wed</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#thu" role="tab" aria-selected="false">Thu</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#fri" role="tab" aria-selected="false">Fri</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#sat" role="tab" aria-selected="false">Sat</a>
+													</li>
+													<li class="nav-item nav-link">
+														<a data-toggle="tab" href="#sun" role="tab" aria-selected="false">Sun</a>
+													</li>
+
+
+												</ul>
+											</nav>
+
+
+											<div class="tab-content">
+
+												<div
+													class="tab-pane active" id="mon">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Monday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="mondayStart" id="mondayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="mondayEnd" id="mondayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+
+												</div>
+
+												<div
+													class="tab-pane" id="tue">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Tueday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="tuesdayStart" id="tuesdayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="tuesdayEnd" id="tuesdayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+
+												</div>
+												<div
+													class="tab-pane" id="wed">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Wednesday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="wednesdayStart" id="wednesdayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="wednesdayEnd" id="wednesdayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+												</div>
+												<div
+													class="tab-pane" id="thu">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Thursday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="thursdayStart" id="thursdayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="thursdayEnd" id="thursdayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+
+												</div>
+												<div
+													class="tab-pane" id="fri">
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Friday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="fridayStart" id="fridayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="fridayEnd" id="fridayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+
+												</div>
+												<div
+													class="tab-pane" id="sat">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Saturday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="saturdayStart" id="saturdayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="saturdayEnd" id="saturdayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+												</div>
+												<div
+													class="tab-pane" id="sun">
+
+
+													<!-- Set No Parking restriction times per Day -->
+													<h3>Sunday</h3>
+													<div class="form-check container-fluid daySlot">
+														<div class="">
+
+
+															<div class="col">
+																start
+																<span></span><input class="timeInput" name="sundayStart" id="sundayStart" type="time" mdp-time-picker/><br><br>
+																end
+																<span></span>
+																<input class="timeInput" name="sundayEnd" id="sundayEnd" type="time" mdp-time-picker/>
+															</div>
+
+														</div>
+													</div>
+
+
+												</div>
+
+
+											</div>
+
+
+										</div>
+
+									</div>
+
+								</div>
+								<br><br>
+								<input type="submit" class="btn btn-primary form-control"/>
+								{% if errorList %}
+									<ul class="errorMessage">
+										{% for error in errorList %}
+											<li>{{error}}</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+
+							</form>
+						</div>
+
+
+					</div>
+				</div>
+
+				<!-- Else Log in -->
+
+
+			</div>
+			<div class="col-sm-1"></div>
+		</div>
+
+	</div>
+
+	<p id="location"></p>
+	{% block scripts %}
+
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+
+		<script>
+				function sideRole(role) {
+				$("#sideFlag").val(role)
+				}
+
+				function checkRadio(id) {
+					if(id == "yesPm"){
+						console.log("Choice: ", 1);
+						$("#pmVal").val(1);  
+
+					} else if (id == "noPm"){
+						console.log("Choice: ", 0);
+						$("#pmVal").val(0);  
+					}
+				}
+
+		</script>
+	{% endblock scripts %}
+
+{% endblock %}
+
+

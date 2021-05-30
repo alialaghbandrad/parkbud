@@ -1,0 +1,46 @@
+.ruleSect {
+    border: solid 1px #495057;
+    text-align: center;
+    width: inherit;
+}
+
+.logo {
+    font-family: "Bebas Neue", cursive;
+}
+
+.daySlot {
+    margin: 10px;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+@media only screen and (max-width: 479px) {
+    .stretched {
+        width: 100%;
+    }
+}
+
+.addrule-form {
+    padding-bottom: 5%;
+}
+
+.mainTitle {
+    margin: 200rem;
+    font-family: "Times New Roman", Times, serif;
+    padding: 200rem;
+}
+
+
+
+#mainParkHeader {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2em;
+    margin-top: 0;
+}
+
+.footer {
+    margin-top: 20px;
+    padding-top: 20px;
+}
